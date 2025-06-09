@@ -13,6 +13,8 @@ TOKEN = "862090266:AAGN0fM-M_n9xCdW8mxFoREbV_cNttLNYsw"  # Замените на
 CHANNEL_ID = "@bot_test_kitmedia"  # Замените на username или ID вашего канала
 ADMIN_ID = 824462834 # Замените на ваш ID для получения уведомлений
 
+
+
 # Настройка логирования
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -67,7 +69,7 @@ async def check_sub_callback(callback: types.CallbackQuery):
 
 async def send_files(message: types.Message):
     """Отправляет файлы пользователю"""
-    user_id = message.from_user.id
+    chat_id = message.chat.id
     
     # Проверяем наличие папки с файлами
     if not os.path.exists(FILES_DIR):
@@ -81,17 +83,16 @@ async def send_files(message: types.Message):
         await message.answer("Файлы ещё не загружены. Попробуйте позже.")
         await bot.send_message(ADMIN_ID, "Внимание! В папке нет файлов. Загрузите файлы.")
         return
-    
-    
+
     # Отправляем каждый файл с индикатором "печатает..."
-    async with ChatActionSender.upload_document(bot=bot, chat_id=user_id):
+    async with ChatActionSender.upload_document(bot=bot, chat_id=chat_id):
         for file_name in files:
             file_path = os.path.join(FILES_DIR, file_name)
 
             try:
                 with open(file_path, "rb") as file:
                     await bot.send_document(
-                        chat_id=user_id,
+                        chat_id=chat_id,
                         document=types.BufferedInputFile(file.read(), filename=file_name),
                         caption=f"Файл: {file_name}",
                     )

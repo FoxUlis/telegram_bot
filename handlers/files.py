@@ -5,7 +5,6 @@ from utils.keyboards import get_subscription_keyboard
 import os
 
 async def send_files(message: types.Message):
-    """Отправка файлов пользователю"""
     try:
         if not os.path.exists(config.FILES_DIR):
             raise FileNotFoundError
@@ -31,7 +30,6 @@ async def send_files(message: types.Message):
         await message.bot.send_message(config.ADMIN_ID, "⚠️ Внимание! Папка с файлами пуста!")
 
 async def check_sub_callback(callback: types.CallbackQuery):
-    """Обработчик проверки подписки"""
     await callback.answer()
     await send_files(callback.message)
 

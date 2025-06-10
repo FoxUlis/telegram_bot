@@ -6,7 +6,6 @@ from utils.logger import setup_logger
 logger = setup_logger()
 
 async def error_handler(event: ErrorEvent):
-    """Централизованная обработка ошибок"""
     exception = event.exception
     update = event.update
     
@@ -24,11 +23,10 @@ async def error_handler(event: ErrorEvent):
             try:
                 await bot.send_message(
                     chat_id=config.ADMIN_ID,
-                    text=error_message[:4000]  # Обрезаем если слишком длинное
+                    text=error_message[:4000]  
                 )
             except Exception as e:
                 logger.error(f"Не удалось отправить уведомление админу: {e}")
 
 def register_error_handlers(dp: Dispatcher):
-    """Регистрация обработчиков ошибок"""
     dp.errors.register(error_handler)

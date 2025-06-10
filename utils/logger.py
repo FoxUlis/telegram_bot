@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 
 def setup_logger():
-    """Настройка логгера с выводом в консоль и файл"""
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
     

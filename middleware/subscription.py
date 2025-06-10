@@ -12,7 +12,6 @@ class SubscriptionMiddleware(BaseMiddleware):
         event: Message | CallbackQuery,
         data: Dict[str, Any]
     ) -> Any:
-        # Получаем пользователя в зависимости от типа события
         if isinstance(event, CallbackQuery):
             user = event.from_user
             message = event.message

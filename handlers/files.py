@@ -5,7 +5,18 @@ from utils.keyboards import get_subscription_keyboard
 from services.subscription_service import check_subscription
 import os
 
+# Создаем словарь для отслеживания выполнения
+active_users = set()
+
 async def send_files(message: types.Message):
+    """Отправка файлов с защитой от дублирования"""
+    user_id = message.from_user.id
+    
+    # Проверяем, не выполняется ли уже отправка для этого пользователя
+    if user_id in active_users:
+        return
+        
+    active_users.add(user_id)
     try:
         if not os.path.exists(config.FILES_DIR):
             raise FileNotFoundError
@@ -28,16 +39,23 @@ async def send_files(message: types.Message):
     except Exception as e:
         await message.answer("⚠️ Файлы временно недоступны. Попробуйте позже.")
         await message.bot.send_message(config.ADMIN_ID, "⚠️ Внимание! Папка с файлами пуста!")
+    finally:
+        active_users.remove(user_id)
 
 async def check_sub_callback(callback: types.CallbackQuery):
-    """Обработчик кнопки проверки подписки"""
+    """Обработчик кнопки с защитой от повторных нажатий"""
     await callback.answer()
     
-    if await check_subscription(callback.bot, callback.from_user.id, config.CHANNEL_ID):
+    # Проверяем подписку
+    is_subscribed = await check_subscription(callback.bot, callback.from_user.id, config.CHANNEL_ID)
+    
+    if is_subscribed:
+        # Удаляем клавиатуру после успешной проверки
+        await callback.message.edit_reply_markup(reply_markup=None)
         await send_files(callback.message)
     else:
         await callback.message.answer(
-            "❌ Вы не подписаны на канал!",
+            "❌ Вы не подписаны на канал! Подпишитесь и нажмите кнопку снова.",
             reply_markup=get_subscription_keyboard()
         )
 

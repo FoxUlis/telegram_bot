@@ -55,7 +55,7 @@ async def check_sub_callback(callback: types.CallbackQuery):
         await send_files(callback.message)
     else:
         await callback.message.answer(
-            "❌ Вы не подписаны на канал! Подпишитесь и нажмите кнопку снова.",
+            f"❌ Вы не подписаны на канал! Подпишитесь {config.CHANNEL_ID} и нажмите кнопку снова.",
             reply_markup=get_subscription_keyboard()
         )
 
